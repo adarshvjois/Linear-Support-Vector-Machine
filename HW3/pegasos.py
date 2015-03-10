@@ -2,6 +2,9 @@
 Created on 20-Feb-2015
 
 @author: adarsh
+    
+    Contains the optimization routine for the SVM
+    
 '''
 from counting_sparse_vec import counting_sparse_vec
 from util import increment, dotProduct
@@ -45,6 +48,12 @@ def pegasos(X_train, y_train, lambda_reg=10 ** -3, epochs=5):
     The Quicker variant of the pegasos, pretty much 
     exactly as here:
     http://research.microsoft.com/pubs/192769/tricks-2012.pdf
+    
+    @param X_train: training data. A list of counting_sparse_vecs
+    @param y_train: training data. A list labels for the training data
+    @param X_test: test data. A list of counting_sparse_vecs
+    @param y_test: test data. A list of labels for the test data.
+    @param lambda_reg: regularization param for SVM. the Constant "C"
     '''
     
     w = counting_sparse_vec()  # initial weight vector
@@ -61,7 +70,7 @@ def pegasos(X_train, y_train, lambda_reg=10 ** -3, epochs=5):
         for i in range(M):
             t = t + 1.0  # iteration number
             
-            #gammat = 1.0 / (lambda_reg * t)  # step size
+            # gammat = 1.0 / (lambda_reg * t)  # step size
             gammat = gamma0 / (1 + gamma0 * lambda_reg * t)
             ywdotx = st * y_train[i] * w.dot(X_train[i])  # projected value scaled        
             
@@ -105,9 +114,16 @@ def scale_vec(scale, vect):
     return vect
 
 def test_lambdas(X_train, y_train, X_test, y_test):
+    """
+        @param X_train: training data. A list of counting_sparse_vecs
+        @param y_train: training data. A list labels for the training data
+        @param X_test: test data. A list of counting_sparse_vecs
+        @param: y_test: test data. A list of labels for the test data.
+           
+    """
     prediction_errs = []
     t0 = time()
-    lambdas = 2.0 ** np.arange(-15, 3,1)
+    lambdas = 2.0 ** np.arange(-15, 3, 1)
     for l in lambdas:
         w = pegasos(X_train, y_train, lambda_reg=l, epochs=500)
         p = prediction_error(X_test, y_test, w)
